@@ -1,7 +1,7 @@
-import Head from 'next/head'
-import Image from 'next/image'
+import { Box, Card, CardActionArea, CardContent, CardMedia, Grid, Slide, Typography } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
+import Link from 'next/link';
 import Layout from '../components/Layout';
-import styles from '../styles/Home.module.css'
 import getCommerce from '../utils/commerce'
 
 export default function Home(props) {
@@ -10,17 +10,47 @@ export default function Home(props) {
 
   return (
     <Layout title="Home" commercePublicKey={props.commercePublicKey}>
-        <div >
+        {
+          products.lenght === 0 &&  <Alert>No  product found</Alert>
+        }
+        <Grid container spacing={1} >
         {products.map((product)=>(
-          <div key={product.id}>
-            <img src={product.media.source} alt={product.name}/>
-            <p>{product.name}</p>
-            <p>{product.price.formatted_with_symbol}</p>
-            <hr></hr>
-            {product.description}
-          </div>
+          <Grid key={product.id} item md={3} >
+            <Slide direction='up' in={true}>
+            <Card>
+                <Link href={`/products/${product.permalink}`}>
+                  <CardActionArea>
+                    <CardMedia
+                      component="img"
+                      alt={product.name}
+                      image={product.media.source}
+                    />
+                    <CardContent>
+                      <Typography
+                        gutterBottom
+                        variant="body2"
+                        color="textPrimary"
+                        component="p"
+                      >
+                        {product.name}
+                      </Typography>
+                      <Box>
+                        <Typography
+                          variant="body1"
+                          color="textPrimary"
+                          component="p"
+                        >
+                          {product.price.formatted_with_symbol}
+                        </Typography>
+                      </Box>
+                    </CardContent>
+                  </CardActionArea>
+                </Link>
+              </Card>
+              </Slide>
+          </Grid>
         ))}
-    </div>
+        </Grid>
     </Layout>
     
   )
@@ -31,7 +61,7 @@ export async function getStaticProps(){
   const commerce = getCommerce();
   // we getting data and rename to products
   const { data: products } = await commerce.products.list();
-  
+  // console.log(products)
   return{
     props:{
       products,
